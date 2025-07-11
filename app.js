@@ -13,10 +13,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.log('MongoDB connection error:', err));
-
+const connectdb = require('./config/mono-connection.js');
 
 app.use(cors());
 app.use(express.json());
@@ -45,4 +42,5 @@ app.set('socketio', io);
 
 server.listen(process.env.PORT || 3000, () => {
     console.log(`Server is running on port ${process.env.PORT || 3000}`);
+    connectdb();
 });
