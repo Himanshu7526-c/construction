@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Construction Inventory</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    socket.on('material-updated', () => {
+      location.reload();
+    });
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="p-6 bg-gray-100 text-gray-800">
+  <h1 class="text-2xl font-bold mb-4">Construction Inventory</h1>
+
+  <form class="mb-4" action="/api/materials/add" method="POST">
+    <input type="text" name="type" placeholder="Material Type" required class="p-2 border rounded mr-2">
+    <input type="number" name="quantity" placeholder="Quantity" required class="p-2 border rounded mr-2">
+    <input type="text" name="site" placeholder="Site" required class="p-2 border rounded mr-2">
+    <button type="submit" class="bg-blue-500 text-white p-2 rounded">Add Material</button>
+  </form>
+
+  <table class="w-full table-auto bg-white rounded shadow">
+    <thead>
+      <tr>
+        <th class="border p-2">Type</th>
+        <th class="border p-2">Quantity</th>
+        <th class="border p-2">Site</th>
+        <th class="border p-2">Use</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% materials.forEach(material => { %>
+        <tr>
+          <td class="border p-2"><%= material.type %></td>
+          <td class="border p-2"><%= material.quantity %></td>
+          <td class="border p-2"><%= material.site %></td>
+          <td class="border p-2">
+            <form action="/api/materials/use/<%= material._id %>" method="POST" class="flex items-center">
+              <input type="number" name="amount" class="p-1 border rounded mr-2 w-20" required>
+              <button class="bg-red-500 text-white p-1 px-3 rounded">Use</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    
+      </tbody>
+    </table>
+
+    <h2 class="text-xl font-semibold mt-8 mb-2">Usage History</h2>
+    <table class="w-full table-auto bg-white rounded shadow">
+      <thead>
+        <tr>
+          <th class="border p-2">Material</th>
+          <th class="border p-2">Used Amount</th>
+          <th class="border p-2">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% materials.forEach(material => { %>
+          <% material.usage.forEach(log => { %>
+            <tr>
+              <td class="border p-2"><%= material.type %></td>
+              <td class="border p-2"><%= log.amount %></td>
+              <td class="border p-2"><%= new Date(log.usedAt).toLocaleString() %></td>
+            </tr>
+          <% }) %>
+        <% }) %>
+      </tbody>
+    </table>
+
+</body>
+</html>
